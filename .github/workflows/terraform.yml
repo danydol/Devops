@@ -100,10 +100,7 @@ jobs:
       - name: Terraform Apply — Phase 2 (Calico operator)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform apply -auto-approve \
-            -target=kubernetes_daemon_set_v1.disable_aws_node \
-            -target=helm_release.calico
+        run: terraform apply -auto-approve -target=helm_release.calico
 
       # Phase 3: Calico CRs + node group + coredns (CRDs now exist)
       - name: Terraform Apply — Phase 3 (Calico CRs + nodes)

@@ -57,7 +57,6 @@ resource "aws_eks_node_group" "nova" {
     Name = "${var.cluster_name}-node"
   }
 
-  # Nodes join only after Calico CNI is fully ready
   depends_on = [
     kubernetes_manifest.calico_installation,
     aws_iam_role_policy_attachment.node_worker,
