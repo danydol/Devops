@@ -50,13 +50,14 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
-      - name: Terraform Plan
+      # ── PR: plan only (skip Calico/K8s resources until cluster exists) ──
+      - name: Terraform Plan (PR)
         id: plan
+        if: github.event_name == 'pull_request'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           terraform plan \
             -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}" \
-            -out=tfplan \
             -no-color 2>&1 | tee plan.txt
         continue-on-error: true
 
@@ -76,7 +77,28 @@ jobs:
               body: `## Terraform Plan\n\`\`\`hcl\n${truncated}\n\`\`\``
             });
 
-      - name: Terraform Apply
+      # ── Push to main: two-phase apply ──────────────────────────────────
+      # Phase 1: VPC + EKS cluster (no Kubernetes/Helm providers needed)
+      - name: Terraform Apply — Phase 1 (VPC + EKS)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve tfplan
+        run: |
+          terraform apply -auto-approve \
+            -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}" \
+            -target=module.vpc \
+            -target=module.eks \
+            -target=aws_iam_role.node \
+            -target=aws_iam_role_policy_attachment.node_worker \
+            -target=aws_iam_role_policy_attachment.node_cni \
+            -target=aws_iam_role_policy_attachment.node_ecr \
+            -target=aws_iam_openid_connect_provider.github \
+            -target=aws_iam_role.github_actions \
+            -target=aws_iam_role_policy_attachment.github_actions_admin
+
+      # Phase 2: Calico CNI + node group (cluster is now up)
+      - name: Terraform Apply — Phase 2 (Calico + nodes)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform apply -auto-approve \
+            -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}"
