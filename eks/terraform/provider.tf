@@ -17,10 +17,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "nova-eks-tfstate-900720407869-il"
-    key     = "eks/terraform.tfstate"
-    region  = "il-central-1"
-    encrypt = true
+    bucket         = "nova-eks-tfstate-900720407869-il"
+    key            = "eks/terraform.tfstate"
+    region         = "il-central-1"
+    encrypt        = true
+    dynamodb_table = "nova-eks-tfstate-lock"
   }
 }
 
