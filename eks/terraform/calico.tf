@@ -5,7 +5,7 @@
 # the primary CNI before nodes join the cluster.
 
 # 1. Disable aws-node DaemonSet (no node will match this selector)
-resource "kubernetes_daemonset_v1" "disable_aws_node" {
+resource "kubernetes_daemon_set_v1" "disable_aws_node" {
   metadata {
     name      = "aws-node"
     namespace = "kube-system"
@@ -66,7 +66,7 @@ resource "helm_release" "calico" {
   wait    = true
   timeout = 300
 
-  depends_on = [kubernetes_daemonset_v1.disable_aws_node]
+  depends_on = [kubernetes_daemon_set_v1.disable_aws_node]
 }
 
 # 3. Calico Installation CR — VXLAN overlay, Calico IPAM
