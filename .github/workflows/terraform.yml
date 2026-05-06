@@ -3,10 +3,15 @@ name: Terraform — nova-eks
 on:
   push:
     branches: [main]
-    paths: [eks/terraform/**]
+    paths:
+      - eks/terraform/**
+      - .github/workflows/terraform.yml
   pull_request:
     branches: [main]
-    paths: [eks/terraform/**]
+    paths:
+      - eks/terraform/**
+      - .github/workflows/terraform.yml
+  workflow_dispatch:
 
 permissions:
   id-token: write   # Required for OIDC assume-role
