@@ -1,1 +1,0 @@
-* Create EC2 keypair and set the name in terraform module
