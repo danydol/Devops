@@ -17,9 +17,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "nova-eks-tfstate-900720407869"
+    bucket  = "nova-eks-tfstate-900720407869-il"
     key     = "eks/terraform.tfstate"
-    region  = "eu-west-1"
+    region  = "il-central-1"
     encrypt = true
   }
 }
