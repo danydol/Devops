@@ -42,11 +42,9 @@ module "eks" {
 
   cluster_endpoint_public_access = true
 
-  # Only core addons — NO vpc-cni (Calico replaces it)
+  # kube-proxy only — coredns needs nodes to schedule (added after node group joins)
+  # NO vpc-cni (Calico replaces it)
   cluster_addons = {
-    coredns = {
-      most_recent = true
-    }
     kube-proxy = {
       most_recent = true
     }
@@ -60,6 +58,12 @@ module "eks" {
 }
 
 # ─── IAM role for GitHub Actions (OIDC assume-role, no long-lived keys) ───────
+
+# Import block — provider was pre-created via CLI; Terraform adopts it on first apply
+import {
+  to = aws_iam_openid_connect_provider.github
+  id = "arn:aws:iam::900720407869:oidc-provider/token.actions.githubusercontent.com"
+}
 
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
@@ -93,6 +97,11 @@ data "aws_iam_policy_document" "github_actions_assume" {
       values   = ["sts.amazonaws.com"]
     }
   }
+}
+
+import {
+  to = aws_iam_role.github_actions
+  id = "nova-eks-github-actions"
 }
 
 resource "aws_iam_role" "github_actions" {

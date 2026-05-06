@@ -65,3 +65,13 @@ resource "aws_eks_node_group" "nova" {
     aws_iam_role_policy_attachment.node_ecr,
   ]
 }
+
+# CoreDNS addon — added after node group exists so pods can be scheduled
+resource "aws_eks_addon" "coredns" {
+  cluster_name                = module.eks.cluster_name
+  addon_name                  = "coredns"
+  addon_version               = "v1.11.4-eksbuild.2"
+  resolve_conflicts_on_create = "OVERWRITE"
+
+  depends_on = [aws_eks_node_group.nova]
+}
