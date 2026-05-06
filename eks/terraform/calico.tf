@@ -13,8 +13,7 @@ resource "helm_release" "calico" {
   namespace        = "tigera-operator"
   create_namespace = true
 
-  wait    = true
-  timeout = 300
+  wait    = false
 
   depends_on = [module.eks]
 }
