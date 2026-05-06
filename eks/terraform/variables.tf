@@ -4,11 +4,6 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "assume_role_arn" {
-  description = "IAM role ARN for Terraform to assume (e.g. arn:aws:iam::900720407869:role/TerraformRole)"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string

@@ -27,11 +27,6 @@ terraform {
 provider "aws" {
   region = var.aws_region
 
-  assume_role {
-    role_arn     = var.assume_role_arn
-    session_name = "terraform-nova-eks"
-  }
-
   default_tags {
     tags = {
       Cluster   = var.cluster_name

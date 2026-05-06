@@ -60,10 +60,7 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform plan \
-            -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}" \
-            -no-color 2>&1 | tee plan.txt
+        run: terraform plan -no-color 2>&1 | tee plan.txt
         continue-on-error: true
 
       - name: Comment PR with plan
@@ -89,7 +86,6 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           terraform apply -auto-approve \
-            -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}" \
             -target=module.vpc \
             -target=module.eks \
             -target=aws_iam_role.node \
@@ -104,6 +100,4 @@ jobs:
       - name: Terraform Apply — Phase 2 (Calico + nodes)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform apply -auto-approve \
-            -var="assume_role_arn=${{ secrets.AWS_ROLE_ARN }}"
+        run: terraform apply -auto-approve
