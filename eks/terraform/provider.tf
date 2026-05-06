@@ -15,6 +15,13 @@ terraform {
       version = "~> 2.24"
     }
   }
+
+  backend "s3" {
+    bucket  = "nova-eks-tfstate-900720407869"
+    key     = "eks/terraform.tfstate"
+    region  = "eu-west-1"
+    encrypt = true
+  }
 }
 
 provider "aws" {
