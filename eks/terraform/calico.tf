@@ -19,6 +19,12 @@ resource "helm_release" "calico" {
 }
 
 # 2. Calico Installation CR — VXLAN overlay, Calico IPAM
+# The helm chart auto-creates this CR; import it so Terraform manages it instead of trying to create it.
+import {
+  to = kubernetes_manifest.calico_installation
+  id = "apiVersion=operator.tigera.io/v1,kind=Installation,name=default"
+}
+
 resource "kubernetes_manifest" "calico_installation" {
   manifest = {
     apiVersion = "operator.tigera.io/v1"
