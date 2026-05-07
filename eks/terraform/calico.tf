@@ -57,6 +57,11 @@ resource "kubernetes_manifest" "calico_installation" {
 }
 
 # 3. Calico API Server CR
+import {
+  to = kubernetes_manifest.calico_apiserver
+  id = "apiVersion=operator.tigera.io/v1,kind=APIServer,name=default"
+}
+
 resource "kubernetes_manifest" "calico_apiserver" {
   manifest = {
     apiVersion = "operator.tigera.io/v1"
