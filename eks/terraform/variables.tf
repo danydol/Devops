@@ -1,5 +1,5 @@
 variable "aws_region" {
-  description = "AWS region for the cluster"
+  description = "AWS region"
   type        = string
   default     = "il-central-1"
 }
