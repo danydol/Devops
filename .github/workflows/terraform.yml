@@ -78,7 +78,7 @@ jobs:
       # ── Push to main: three-phase apply ────────────────────────────────
       # Phase 1: VPC + EKS cluster (AWS-only, no K8s/Helm providers needed)
       - name: Terraform Apply — Phase 1 (VPC + EKS)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           terraform apply -auto-approve \
@@ -94,12 +94,12 @@ jobs:
 
       # Phase 2: Install Calico operator — must complete before CRDs exist
       - name: Terraform Apply — Phase 2 (Calico operator)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve -target=helm_release.calico
 
       # Phase 3: Calico CRs + node group + coredns (CRDs now exist)
       - name: Terraform Apply — Phase 3 (Calico CRs + nodes)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve
